@@ -170,8 +170,13 @@ export default function App() {
             </button>
           </div>
 
-          <div className="text-[11px] text-slate-500 pt-2">
-            Secure authentication powered by Firebase
+          <div className="space-y-1 pt-2">
+            <div className="text-[11px] text-slate-500">
+              Secure authentication powered by Firebase
+            </div>
+            <div className="text-[10px] text-slate-600">
+              © 2026 JLPT Master Sensei. All rights reserved.
+            </div>
           </div>
 
         </div>
