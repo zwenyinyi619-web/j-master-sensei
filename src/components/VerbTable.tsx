@@ -43,14 +43,6 @@ export const VerbTable: React.FC<VerbTableProps> = ({
     return v.meaning_en;
   };
 
-  const getVerbExample = (v: VerbItem) => {
-    if (!v) return '';
-    if (language === 'my') return v.example_my;
-    if (language === 'th') return v.example_th || v.example_en;
-    if (language === 'vi') return v.example_vi || v.example_en;
-    return v.example_en;
-  };
-
   // Filter verbs
   const filteredVerbs = useMemo(() => {
     return verbsData.filter((v) => {
@@ -344,31 +336,6 @@ export const VerbTable: React.FC<VerbTableProps> = ({
                     </button>
                   </div>
                 ))}
-              </div>
-            </div>
-
-            {/* Practical Example Sentence */}
-            <div className="bg-slate-850 p-4 rounded-2xl border border-slate-800 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-                  {t.example}
-                </span>
-                <button
-                  onClick={() => handleAudio(selectedVerb.example_jp)}
-                  className="p-1 rounded-md bg-slate-800 hover:bg-slate-700 text-rose-300"
-                  title={t.playAudio}
-                >
-                  <Volume2 className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="text-sm font-bold text-white font-serif">
-                {selectedVerb.example_jp}
-              </div>
-              <div className="text-xs text-slate-400 font-mono">
-                {selectedVerb.example_romaji}
-              </div>
-              <div className="text-xs font-medium text-amber-300 pt-1 border-t border-slate-800">
-                {getVerbExample(selectedVerb)}
               </div>
             </div>
           </div>
