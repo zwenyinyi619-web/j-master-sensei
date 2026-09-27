@@ -17,6 +17,8 @@ import { JLPTFilter, Language } from '../types/common';
 import { kanjiQuizN5, kanjiQuizN4, kanjiQuizN3, allKanjiQuizData, KanjiQuizQuestion } from '../data/kanjiQuizData';
 import { translations } from '../i18n/translations';
 import { playJapaneseAudio } from '../utils/audio';
+import { saveUserProgress } from '../userService';
+import { auth } from '../firebase';
 
 interface QuizViewProps {
   language: Language;
@@ -78,6 +80,19 @@ export const QuizView: React.FC<QuizViewProps> = ({
       setIsAnswered(false);
     } else {
       setCompleted(true);
+      
+      // Calculate final score including current question if correct
+      const finalScore = score + (currentQ && selectedOption === currentQ.correctIndex ? 1 : 0);
+
+      // Save progress to Firebase Firestore
+      if (auth.currentUser) {
+        saveUserProgress(auth.currentUser.uid, {
+          quizScore: finalScore,
+          totalQuestions: currentQuestions.length,
+          level: activeLevel,
+          lastStudied: new Date().toISOString(),
+        }).catch((err) => console.error("Failed to save progress:", err));
+      }
     }
   };
 
