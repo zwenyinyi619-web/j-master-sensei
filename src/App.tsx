@@ -11,11 +11,11 @@ import { FlashcardView } from './components/FlashcardView';
 import { GrammarPracticeView } from './components/GrammarPracticeView';
 import { QuizView } from './components/QuizView';
 import { WorksheetPrintView } from './components/WorksheetPrintView';
+import { ProfileView } from './components/ProfileView';
 import { Footer } from './components/Footer';
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { auth } from "./firebase";
 import { LogIn, Sparkles } from 'lucide-react';
-import { ProfileView } from './components/ProfileView';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<AppTab>('home');
@@ -191,6 +191,14 @@ export default function App() {
           <WorksheetPrintView
             language={language}
             levelFilter={levelFilter}
+          />
+        )}
+
+        {currentTab === 'profile' && (
+          <ProfileView
+            user={user}
+            language={language}
+            onLogout={() => auth.signOut()}
           />
         )}
       </main>
