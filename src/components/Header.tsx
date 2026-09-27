@@ -15,6 +15,7 @@ import {
   FileText,
   ChevronDown,
   Check,
+  User,
 } from 'lucide-react';
 import { AppTab, JLPTFilter, Language } from '../types/common';
 import { translations } from '../i18n/translations';
@@ -76,6 +77,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'practice', label: t.navPractice, icon: <HelpCircle className="w-4 h-4" /> },
     { id: 'quiz', label: t.navQuiz, icon: <GraduationCap className="w-4 h-4" /> },
     { id: 'worksheet', label: t.navWorksheet, icon: <FileText className="w-4 h-4" /> },
+    { id: 'profile', label: language === 'my' ? 'ကိုယ်ရေးအချက်အလက်' : 'Profile', icon: <User className="w-4 h-4 text-rose-400" /> },
   ];
 
   return (
