@@ -15,7 +15,7 @@ import { ProfileView } from './components/ProfileView';
 import { Footer } from './components/Footer';
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { auth } from "./firebase";
-import { LogIn, Sparkles } from 'lucide-react';
+import { LogIn, Sparkles, UserCheck } from 'lucide-react';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<AppTab>('home');
@@ -29,7 +29,7 @@ export default function App() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+      setUser((prev: any) => prev?.isGuest ? prev : currentUser);
       setLoading(false);
     });
     return () => unsubscribe();
@@ -42,6 +42,17 @@ export default function App() {
     } catch (error) {
       console.error("Login failed:", error);
     }
+  };
+
+  // Guest Mode ဖြင့် ဝင်ရောက်ခြင်း function
+  const handleGuestLogin = () => {
+    setUser({
+      uid: 'guest_user',
+      displayName: language === 'my' ? 'ဧည့်သည် (Guest)' : 'Guest User',
+      email: 'guest@jlptmaster.app',
+      photoURL: null,
+      isGuest: true,
+    });
   };
 
   const languages: Language[] = ['my', 'en', 'th', 'vi'];
@@ -66,7 +77,7 @@ export default function App() {
     );
   }
 
-  // အကယ်၍ Log in မဝင်ရသေးပါက ပြသရန် Login Wall (Language Switcher ပါဝင်သော ပုံစံ)
+  // အကယ်၍ Log in မဝင်ရသေးပါက ပြသရန် Login Wall
   if (!user) {
     const languageOptions: { id: Language; label: string; flag: string }[] = [
       { id: 'my', label: 'မြန်မာ', flag: '🇲🇲' },
@@ -124,11 +135,11 @@ export default function App() {
               : 'Sign in to access all study materials and save your learning progress securely.'}
           </p>
 
-          {/* Login Button */}
+          {/* Login Buttons */}
           <div className="space-y-3.5 w-full">
             <button
               onClick={handleGoogleLogin}
-              className="w-full flex items-center justify-center space-x-3 py-4 px-6 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-sm shadow-xl transition-all hover:scale-[1.02] active:scale-95 cursor-pointer border border-slate-200"
+              className="w-full flex items-center justify-center space-x-3 py-3.5 px-6 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-sm shadow-xl transition-all hover:scale-[1.02] active:scale-95 cursor-pointer border border-slate-200"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
@@ -144,6 +155,17 @@ export default function App() {
                   : language === 'vi' 
                   ? 'Tiếp tục với Google' 
                   : 'Continue with Google'}
+              </span>
+            </button>
+
+            {/* Guest Mode Button */}
+            <button
+              onClick={handleGuestLogin}
+              className="w-full flex items-center justify-center space-x-2 py-3.5 px-6 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-sm shadow-lg transition-all hover:scale-[1.02] active:scale-95 cursor-pointer border border-slate-700"
+            >
+              <UserCheck className="w-4 h-4 text-rose-400" />
+              <span>
+                {language === 'my' ? 'ဧည့်သည် (Guest) အနေဖြင့် ဝင်မည်' : 'Continue as Guest'}
               </span>
             </button>
           </div>
@@ -169,6 +191,7 @@ export default function App() {
         onChangeLevel={setLevelFilter}
         soundEnabled={soundEnabled}
         onToggleSound={toggleSound}
+        user={user}
       />
 
       {/* Main Content Area */}
@@ -257,7 +280,7 @@ export default function App() {
           <ProfileView
             user={user}
             language={language}
-            onLogout={() => auth.signOut()}
+            onLogout={() => setUser(null)}
           />
         )}
       </main>
