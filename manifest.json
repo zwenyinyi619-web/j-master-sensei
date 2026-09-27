@@ -1,14 +1,15 @@
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>JLPT Master Sensei</title>
-
-  <!-- iOS Home Screen Icon & Web App Settings -->
-  <link rel="apple-touch-icon" href="/icon.png" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="JLPT Master" />
-  
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="/icon.png" />
-</head>
+{
+  "short_name": "JLPT Master",
+  "name": "JLPT Master Sensei",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "display": "standalone"
+}
