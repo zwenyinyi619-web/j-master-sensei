@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Sparkles,
   Layers,
@@ -10,6 +10,8 @@ import {
   CheckCircle2,
   FileText,
   Award,
+  LogIn,
+  User as UserIcon,
 } from 'lucide-react';
 import { AppTab, JLPTFilter, Language } from '../types/common';
 import { translations } from '../i18n/translations';
@@ -17,6 +19,8 @@ import { verbsData } from '../data/verbsData';
 import { kanjiData } from '../data/kanjiData';
 import { grammarData } from '../data/grammarData';
 import { playJapaneseAudio } from '../utils/audio';
+import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { auth } from "../firebase";
 
 interface HomeViewProps {
   language: Language;
@@ -32,6 +36,26 @@ export const HomeView: React.FC<HomeViewProps> = ({
   soundEnabled,
 }) => {
   const t = translations[language];
+
+  // User Authentication State
+  const [user, setUser] = useState<any>(null);
+
+  React.useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleGoogleLogin = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      setUser(result.user);
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
+  };
 
   // Daily featured items
   const featuredVerb = verbsData[0]; // 食べる
@@ -100,13 +124,33 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <div className="absolute bottom-0 left-1/3 -mb-16 w-80 h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
 
         <div className="relative z-10 max-w-3xl space-y-4">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-semibold">
-            <Sparkles className="w-3.5 h-3.5 text-rose-400" />
-            <span>
-              {language === 'my'
-                ? 'မြန်မာ-ဂျပန် ဘာသာစကား အဆင့်မြင့် လေ့လာရေး'
-                : 'Myanmar-Japanese Comprehensive Learning'}
-            </span>
+          <div className="flex items-center justify-between">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-semibold">
+              <Sparkles className="w-3.5 h-3.5 text-rose-400" />
+              <span>
+                {language === 'my'
+                  ? 'မြန်မာ-ဂျပန် ဘာသာစကား အဆင့်မြင့် လေ့လာရေး'
+                  : 'Myanmar-Japanese Comprehensive Learning'}
+              </span>
+            </div>
+
+            {/* Google Auth Button / User Badge */}
+            <div>
+              {user ? (
+                <div className="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-slate-800 text-emerald-400 border border-slate-700 font-semibold text-xs shadow">
+                  <UserIcon className="w-3.5 h-3.5" />
+                  <span>{user.displayName || 'Signed In'}</span>
+                </div>
+              ) : (
+                <button
+                  onClick={handleGoogleLogin}
+                  className="flex items-center space-x-2 px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs shadow-lg transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                >
+                  <LogIn className="w-3.5 h-3.5 text-rose-600" />
+                  <span>{language === 'my' ? 'Google ဖြင့် ဝင်မည်' : 'Sign in with Google'}</span>
+                </button>
+              )}
+            </div>
           </div>
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
