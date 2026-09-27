@@ -110,6 +110,7 @@ export default function App() {
         onChangeLevel={setLevelFilter}
         soundEnabled={soundEnabled}
         onToggleSound={toggleSound}
+        user={user}
       />
 
       {/* Main Content Area */}
