@@ -29,6 +29,7 @@ interface HeaderProps {
   onChangeLevel: (level: JLPTFilter) => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
+  user?: any;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -81,37 +82,35 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-slate-100 shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 gap-1">
           <div
-            className="flex items-center space-x-3 cursor-pointer select-none group"
+            className="flex items-center space-x-2 cursor-pointer select-none group min-w-0"
             onClick={() => onSelectTab('home')}
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 via-red-500 to-amber-500 flex items-center justify-center shadow-lg shadow-rose-900/30 group-hover:scale-105 transition-transform">
-              <span className="text-white font-bold text-lg font-serif">日</span>
+            <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-tr from-rose-600 via-red-500 to-amber-500 flex items-center justify-center shadow-lg shadow-rose-900/30 group-hover:scale-105 transition-transform">
+              <span className="text-white font-bold text-base font-serif">日</span>
             </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="font-bold text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-rose-400 to-amber-200">
+            <div className="min-w-0">
+              <div className="flex items-center space-x-1.5">
+                <span className="font-bold text-sm sm:text-base tracking-tight truncate bg-clip-text text-transparent bg-gradient-to-r from-rose-400 to-amber-200">
                   {t.appName}
                 </span>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-semibold border border-rose-500/30">
-                  JLPT N5-N3
-                </span>
               </div>
-              <p className="text-xs text-slate-400 hidden sm:block truncate max-w-xs md:max-w-sm">
+              <p className="text-[10px] text-slate-400 truncate">
                 {t.appSubtitle}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-2 sm:space-x-3">
-            <div className="hidden md:flex items-center bg-slate-800/80 p-0.5 rounded-lg border border-slate-700">
+          <div className="flex items-center space-x-1.5 sm:space-x-3">
+            {/* Level Filter - Responsive (Always visible now with compact sizing) */}
+            <div className="flex items-center bg-slate-800/80 p-0.5 rounded-lg border border-slate-700">
               {(['All', 'N5', 'N4', 'N3'] as JLPTFilter[]).map((lvl) => (
                 <button
                   key={lvl}
                   onClick={() => onChangeLevel(lvl)}
-                  className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all ${
+                  className={`px-2 py-1 text-[11px] sm:text-xs font-semibold rounded transition-all ${
                     levelFilter === lvl
                       ? 'bg-rose-600 text-white shadow-sm'
                       : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
@@ -125,10 +124,10 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="relative" ref={langMenuRef}>
               <button
                 onClick={() => setLangMenuOpen(!langMenuOpen)}
-                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold transition-all shadow-sm cursor-pointer"
+                className="flex items-center space-x-1 px-2 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold transition-all shadow-sm cursor-pointer"
               >
                 <Languages className="w-3.5 h-3.5 text-amber-400" />
-                <span>{currentLangObj.flag} {currentLangObj.label}</span>
+                <span>{currentLangObj.flag}</span>
                 <ChevronDown className="w-3 h-3 text-amber-400/80" />
               </button>
 
@@ -160,7 +159,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={onToggleSound}
-              className={`p-2 rounded-lg border text-xs transition-colors ${
+              className={`p-1.5 rounded-lg border text-xs transition-colors ${
                 soundEnabled
                   ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
                   : 'bg-red-950/40 border-red-800/50 text-red-400'
@@ -171,7 +170,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:text-white"
+              className="lg:hidden p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:text-white"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
