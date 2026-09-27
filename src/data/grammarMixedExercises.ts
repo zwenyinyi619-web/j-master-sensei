@@ -3,85 +3,65 @@ import { JLPTLevel } from '../types/verb';
 import { grammarListN5, grammarListN4, grammarListN3 } from './grammarMasterList';
 
 /**
- * Builds 300 mixed grammar questions for a specific JLPT level.
+ * Builds mixed grammar questions dynamically from the actual grammar list.
  */
-export function build300MixedQuestions(level: JLPTLevel): ExerciseQuestion[] {
+function buildDynamicMixedQuestions(level: JLPTLevel): ExerciseQuestion[] {
   const grammarPool = level === 'N5' ? grammarListN5 : level === 'N4' ? grammarListN4 : grammarListN3;
   const questions: ExerciseQuestion[] = [];
-  const target = 300;
 
-  for (let i = 0; i < target; i++) {
-    const item = grammarPool[i % grammarPool.length];
-    const ex = item.examples[0] || { jp: '私は学生です。', romaji: 'Watashi wa gakusei desu.', my: 'ကျွန်တော်သည် ကျောင်းသားပါ။', en: 'I am a student.' };
+  // grammarPool ထဲမှာရှိတဲ့ သဒ္ဒါတစ်ခုချင်းစီအတွက် မေးခွန်း ၁ ခုစီ (သို့မဟုတ် လိုသလောက်) ထုတ်ပေးခြင်း
+  grammarPool.forEach((item, index) => {
+    // ဥပမာဝါကျ ရှိရင် ယူမယ်၊ မရှိရင် Default သုံးမယ်
+    const ex = item.examples[0] || { 
+      jp: '私は学生です。', 
+      romaji: 'Watashi wa gakusei desu.', 
+      my: 'ကျွန်တော်သည် ကျောင်းသားပါ။', 
+      en: 'I am a student.' 
+    };
 
-    const typeMod = i % 5;
-    let questionJp = '';
-    let romaji = '';
-    let options: string[] = [];
-    let correctIndex = 0;
-    let explanationMy = '';
-    let explanationEn = '';
+    // ဂျပန်စာ ဥပမာဝါကျထဲက သဒ္ဒါပုံစံ (pattern) နေရာကို (　) နဲ့ အစားထိုးခြင်း (သို့မဟုတ် ဖြည့်စွက်ခြင်း)
+    // ဤနေရာတွင် သဒ္ဒါ pattern ကို အခြေခံ၍ မေးခွန်းတည်ဆောက်နိုင်ပါသည်
+    const targetPattern = item.pattern;
+    const questionJp = ex.jp.includes(targetPattern) 
+      ? ex.jp.replace(targetPattern, '（　）') 
+      : `${targetPattern} を使う文： ${ex.jp}（　）`;
 
-    if (typeMod === 0) {
-      questionJp = `私は毎朝 パン（　）食べます。`;
-      romaji = 'Watashi wa maiasa pan ( ) tabemasu.';
-      options = ['を (o)', 'に (ni)', 'で (de)', 'へ (e)'];
-      correctIndex = 0;
-      explanationMy = 'စားသောက်ခြင်း၏ တိုက်ရိုက်ကံပုဒ်ဖြစ်၍ 「を」 ကို သုံးပါသည်။';
-      explanationEn = 'Direct object marker particle "o".';
-    } else if (typeMod === 1) {
-      questionJp = `すみません、写真を（　）ください。`;
-      romaji = 'Sumimasen, shashin o ( ) kudasai.';
-      options = ['撮って (totte)', '撮り (tori)', '撮る (toru)', '撮った (totta)'];
-      correctIndex = 0;
-      explanationMy = 'ယဉ်ကျေးစွာ တောင်းဆိုရာတွင် ကြိယာ Te-form + ください ဖြစ်သောကြောင့် 撮って မှန်ကန်ပါသည်။';
-      explanationEn = 'Polite request requires Te-form + kudasai.';
-    } else if (typeMod === 2) {
-      questionJp = `日本へ 行った（　）が ありますか。`;
-      romaji = 'Nihon e itta ( ) ga arimasu ka.';
-      options = ['こと (koto)', 'もの (mono)', 'とき (toki)', 'ところ (tokoro)'];
-      correctIndex = 0;
-      explanationMy = 'အတိတ်အတွေ့အကြုံ ဖော်ပြရာတွင် 〜た ことがあります ပုံစံ ဖြစ်ပါသည်။';
-      explanationEn = 'Past experience pattern: Ta-form + koto ga arimasu.';
-    } else if (typeMod === 3) {
-      questionJp = `部屋が 暗いですから、電気を（　）ましょう。`;
-      romaji = 'Heya ga kurai desu kara, denki o ( ) mashou.';
-      options = ['つけ (tsuke)', '消し (keshi)', '開け (ake)', '閉め (shime)'];
-      correctIndex = 0;
-      explanationMy = 'အခန်းမှောင်နေသဖြင့် မီးဖွင့်ကြစို့ (つけましょう) ဖြစ်ပါသည်။';
-      explanationEn = 'Turn on light: tsukemashou.';
-    } else {
-      questionJp = `熱が ありますから、早く（　）ほうがいいです。`;
-      romaji = 'Netsu ga arimasu kara, hayaku ( ) hou ga ii desu.';
-      options = ['寝た (neta)', '寝る (neru)', '寝て (nete)', '寝ない (nenai)'];
-      correctIndex = 0;
-      explanationMy = 'အကြံပြုတိုက်တွန်းရာတွင် ကြိယာ Ta-form + ほうがいいです ကို သုံးပါသည်။';
-      explanationEn = 'Advice pattern: Ta-form + hou ga ii desu.';
-    }
+    const romaji = ex.romaji;
+    
+    // မှန်ကန်သော ဖြေဆိုရမည့် options များကို ဖန်တီးခြင်း
+    // (တကယ်တမ်းတွင် Distractors များ ထည့်ရန် လိုအပ်ပါမည်)
+    const options = [
+      `${targetPattern}`, 
+      '違う文法A', 
+      '違う文法B', 
+      '違う文法C'
+    ];
+    // options များကို ရောနှောခြင်း သို့မဟုတ် correctIndex ကို သတ်မှတ်ခြင်း
+    const correctIndex = 0; 
 
     questions.push({
-      id: `mixed-${level.toLowerCase()}-${i + 1}`,
+      id: `mixed-${level.toLowerCase()}-${index + 1}`,
       level,
-      question_jp: `[#${i + 1}] ${questionJp}`,
+      question_jp: `[#${index + 1}] ${questionJp}`,
       romaji,
       options,
       correctIndex,
-      explanation_my: explanationMy,
-      explanation_en: explanationEn,
+      explanation_my: `「${targetPattern}」၏ အသုံးပြုပုံ: ${item.meaning}`,
+      explanation_en: `Usage of "${targetPattern}": ${item.meaning}`,
       translation_my: ex.my,
       translation_en: ex.en,
     });
-  }
+  });
 
   return questions;
 }
 
-export const mixedGrammarN5: ExerciseQuestion[] = build300MixedQuestions('N5');
-export const mixedGrammarN4: ExerciseQuestion[] = build300MixedQuestions('N4');
-export const mixedGrammarN3: ExerciseQuestion[] = build300MixedQuestions('N3');
+export const mixedGrammarN5: ExerciseQuestion[] = buildDynamicMixedQuestions('N5');
+export const mixedGrammarN4: ExerciseQuestion[] = buildDynamicMixedQuestions('N4');
+export const mixedGrammarN3: ExerciseQuestion[] = buildDynamicMixedQuestions('N3');
 
 export const all900MixedGrammarQuestions: ExerciseQuestion[] = [
-  ...mixedGrammarN5, // 300 N5
-  ...mixedGrammarN4, // 300 N4
-  ...mixedGrammarN3, // 300 N3
+  ...mixedGrammarN5,
+  ...mixedGrammarN4,
+  ...mixedGrammarN3,
 ];
