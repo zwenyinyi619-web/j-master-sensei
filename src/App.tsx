@@ -35,6 +35,38 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
+  // Idle Timeout (မိနစ် ၃၀ အတွင်း မလှုပ်ရှားရင် အလိုအလျောက် Log out ဖြစ်ရန်)
+  useEffect(() => {
+    if (!user) return; // Login မဝင်ရသေးရင် အလုပ်မလုပ်ရန်
+
+    let inactivityTimer: any;
+
+    const resetTimer = () => {
+      clearTimeout(inactivityTimer);
+      // မိနစ် ၃၀ (30 * 60 * 1000 ms) - လိုအပ်ပါက အချိန်ချိန်နိုင်ပါသည်
+      inactivityTimer = setTimeout(() => {
+        auth.signOut();
+        setUser(null);
+      }, 30 * 60 * 1000); 
+    };
+
+    // User လှုပ်ရှားမှုကို စောင့်ကြည့်ရန် events တွေ
+    window.addEventListener('mousemove', resetTimer);
+    window.addEventListener('keypress', resetTimer);
+    window.addEventListener('click', resetTimer);
+    window.addEventListener('scroll', resetTimer);
+
+    resetTimer(); // Start timer
+
+    return () => {
+      clearTimeout(inactivityTimer);
+      window.removeEventListener('mousemove', resetTimer);
+      window.removeEventListener('keypress', resetTimer);
+      window.removeEventListener('click', resetTimer);
+      window.removeEventListener('scroll', resetTimer);
+    };
+  }, [user]);
+
   const handleGoogleLogin = async () => {
     try {
       const provider = new GoogleAuthProvider();
