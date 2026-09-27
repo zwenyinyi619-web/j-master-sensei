@@ -436,13 +436,7 @@ export const VerbThirteenFormsPractice: React.FC<VerbPracticeProps> = ({
                     setUserInputs((prev) => ({ ...prev, [form.key]: e.target.value }));
                     if (checked) setChecked(false);
                   }}
-                  placeholder={
-                    checked
-                      ? ''
-                      : language === 'my'
-                      ? `ဥပမာ- ${expected}`
-                      : `Enter ${form.name_en}`
-                  }
+                  placeholder=""
                   className={`w-full px-3.5 py-2.5 rounded-xl text-base font-medium transition-all ${
                     isCorrect
                       ? 'bg-emerald-950/40 border-2 border-emerald-500 text-emerald-200'
