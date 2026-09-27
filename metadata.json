@@ -1,0 +1,6 @@
+{
+  "name": "J-Master Myanmar: Japanese Learning & AI Kaiwa Studio",
+  "description": "Comprehensive Japanese learning platform for Myanmar learners with Verb Conjugation, Kanji Studio, Grammar Guide, and intelligent AI Kaiwa Sensei supporting Myanmar and English language switching.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
