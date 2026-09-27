@@ -15,10 +15,11 @@ import {
   FileText,
   ChevronDown,
   Check,
-  User,
+  User as UserIcon,
 } from 'lucide-react';
 import { AppTab, JLPTFilter, Language } from '../types/common';
 import { translations } from '../i18n/translations';
+import { User } from 'firebase/auth';
 
 interface HeaderProps {
   currentTab: AppTab;
@@ -29,6 +30,7 @@ interface HeaderProps {
   onChangeLevel: (level: JLPTFilter) => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
+  user?: User | null;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -40,6 +42,7 @@ export const Header: React.FC<HeaderProps> = ({
   onChangeLevel,
   soundEnabled,
   onToggleSound,
+  user,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
@@ -77,7 +80,6 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'practice', label: t.navPractice, icon: <HelpCircle className="w-4 h-4" /> },
     { id: 'quiz', label: t.navQuiz, icon: <GraduationCap className="w-4 h-4" /> },
     { id: 'worksheet', label: t.navWorksheet, icon: <FileText className="w-4 h-4" /> },
-    { id: 'profile', label: language === 'my' ? 'ကိုယ်ရေးအချက်အလက်' : 'Profile', icon: <User className="w-4 h-4 text-rose-400" /> },
   ];
 
   return (
@@ -108,7 +110,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Right Controls: Level Filter, Language Dropdown, Sound & Mobile Menu */}
+          {/* Right Controls: Level Filter, Language Dropdown, Sound, User Profile & Mobile Menu */}
           <div className="flex items-center space-x-2 sm:space-x-3">
             {/* Level Selector */}
             <div className="hidden md:flex items-center bg-slate-800/80 p-0.5 rounded-lg border border-slate-700">
@@ -127,7 +129,7 @@ export const Header: React.FC<HeaderProps> = ({
               ))}
             </div>
 
-            {/* Multilingual Switcher Dropdown (Myanmar, English, Thai, Vietnamese) */}
+            {/* Multilingual Switcher Dropdown */}
             <div className="relative" ref={langMenuRef}>
               <button
                 onClick={() => setLangMenuOpen(!langMenuOpen)}
@@ -182,6 +184,28 @@ export const Header: React.FC<HeaderProps> = ({
             >
               {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
             </button>
+
+            {/* User Profile Badge (Clickable to go to Profile Tab) */}
+            {user && (
+              <button
+                onClick={() => onSelectTab('profile')}
+                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                  currentTab === 'profile'
+                    ? 'bg-rose-600 border-rose-500 text-white shadow-md'
+                    : 'bg-slate-800/80 hover:bg-slate-700 border-slate-700 text-slate-200'
+                }`}
+                title="Profile & Scores"
+              >
+                {user.photoURL ? (
+                  <img src={user.photoURL} alt="Profile" className="w-5 h-5 rounded-full object-cover" />
+                ) : (
+                  <UserIcon className="w-3.5 h-3.5 text-rose-400" />
+                )}
+                <span className="hidden sm:inline truncate max-w-[100px]">
+                  {user.displayName || user.email?.split('@')[0]}
+                </span>
+              </button>
+            )}
 
             {/* Mobile menu trigger */}
             <button
@@ -255,6 +279,24 @@ export const Header: React.FC<HeaderProps> = ({
                 <span className="truncate">{item.label}</span>
               </button>
             ))}
+
+            {/* Profile Button in Mobile Menu */}
+            {user && (
+              <button
+                onClick={() => {
+                  onSelectTab('profile');
+                  setMobileMenuOpen(false);
+                }}
+                className={`flex items-center space-x-2 px-3 py-2.5 rounded-lg text-xs text-left font-medium transition-colors col-span-2 ${
+                  currentTab === 'profile'
+                    ? 'bg-rose-600 text-white font-semibold'
+                    : 'bg-rose-950/30 text-rose-300 border border-rose-500/30'
+                }`}
+              >
+                <UserIcon className="w-4 h-4 text-rose-400" />
+                <span className="truncate">{language === 'my' ? 'ကိုယ်ရေးအချက်အလက် (Profile)' : 'Profile'}</span>
+              </button>
+            )}
           </div>
         </div>
       )}
