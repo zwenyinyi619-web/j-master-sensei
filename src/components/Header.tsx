@@ -15,11 +15,10 @@ import {
   FileText,
   ChevronDown,
   Check,
-  User as UserIcon,
+  User,
 } from 'lucide-react';
 import { AppTab, JLPTFilter, Language } from '../types/common';
 import { translations } from '../i18n/translations';
-import { User } from 'firebase/auth';
 
 interface HeaderProps {
   currentTab: AppTab;
@@ -30,7 +29,6 @@ interface HeaderProps {
   onChangeLevel: (level: JLPTFilter) => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
-  user?: User | null;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -42,14 +40,12 @@ export const Header: React.FC<HeaderProps> = ({
   onChangeLevel,
   soundEnabled,
   onToggleSound,
-  user,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const langMenuRef = useRef<HTMLDivElement | null>(null);
   const t = translations[language];
 
-  // Close language menu on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (langMenuRef.current && !langMenuRef.current.contains(event.target as Node)) {
@@ -80,14 +76,13 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'practice', label: t.navPractice, icon: <HelpCircle className="w-4 h-4" /> },
     { id: 'quiz', label: t.navQuiz, icon: <GraduationCap className="w-4 h-4" /> },
     { id: 'worksheet', label: t.navWorksheet, icon: <FileText className="w-4 h-4" /> },
+    { id: 'profile', label: language === 'my' ? 'ကိုယ်ရေးအချက်အလက်' : 'Profile', icon: <User className="w-4 h-4 text-rose-400" /> },
   ];
 
   return (
     <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-slate-100 shadow-md">
-      {/* Top Banner Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo & Title */}
           <div
             className="flex items-center space-x-3 cursor-pointer select-none group"
             onClick={() => onSelectTab('home')}
@@ -110,9 +105,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Right Controls: Level Filter, Language Dropdown, Sound, User Profile & Mobile Menu */}
           <div className="flex items-center space-x-2 sm:space-x-3">
-            {/* Level Selector */}
             <div className="hidden md:flex items-center bg-slate-800/80 p-0.5 rounded-lg border border-slate-700">
               {(['All', 'N5', 'N4', 'N3'] as JLPTFilter[]).map((lvl) => (
                 <button
@@ -129,25 +122,18 @@ export const Header: React.FC<HeaderProps> = ({
               ))}
             </div>
 
-            {/* Multilingual Switcher Dropdown */}
             <div className="relative" ref={langMenuRef}>
               <button
                 onClick={() => setLangMenuOpen(!langMenuOpen)}
-                title={t.switchLanguage}
-                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold transition-all hover:scale-105 active:scale-95 shadow-sm cursor-pointer"
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold transition-all shadow-sm cursor-pointer"
               >
                 <Languages className="w-3.5 h-3.5 text-amber-400" />
-                <span>
-                  {currentLangObj.flag} {currentLangObj.label}
-                </span>
+                <span>{currentLangObj.flag} {currentLangObj.label}</span>
                 <ChevronDown className="w-3 h-3 text-amber-400/80" />
               </button>
 
               {langMenuOpen && (
-                <div className="absolute right-0 mt-2 w-44 rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100">
-                  <div className="px-3 py-1 text-[10px] uppercase font-bold text-slate-400 border-b border-slate-800">
-                    {t.switchLanguage}
-                  </div>
+                <div className="absolute right-0 mt-2 w-44 rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl py-1.5 z-50">
                   {languageOptions.map((opt) => (
                     <button
                       key={opt.id}
@@ -172,7 +158,6 @@ export const Header: React.FC<HeaderProps> = ({
               )}
             </div>
 
-            {/* Sound Toggle */}
             <button
               onClick={onToggleSound}
               className={`p-2 rounded-lg border text-xs transition-colors ${
@@ -180,34 +165,10 @@ export const Header: React.FC<HeaderProps> = ({
                   ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
                   : 'bg-red-950/40 border-red-800/50 text-red-400'
               }`}
-              title={soundEnabled ? 'Audio enabled' : 'Audio muted'}
             >
               {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
             </button>
 
-            {/* User Profile Badge (Clickable to go to Profile Tab) */}
-            {user && (
-              <button
-                onClick={() => onSelectTab('profile')}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
-                  currentTab === 'profile'
-                    ? 'bg-rose-600 border-rose-500 text-white shadow-md'
-                    : 'bg-slate-800/80 hover:bg-slate-700 border-slate-700 text-slate-200'
-                }`}
-                title="Profile & Scores"
-              >
-                {user.photoURL ? (
-                  <img src={user.photoURL} alt="Profile" className="w-5 h-5 rounded-full object-cover" />
-                ) : (
-                  <UserIcon className="w-3.5 h-3.5 text-rose-400" />
-                )}
-                <span className="hidden sm:inline truncate max-w-[100px]">
-                  {user.displayName || user.email?.split('@')[0]}
-                </span>
-              </button>
-            )}
-
-            {/* Mobile menu trigger */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="lg:hidden p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:text-white"
@@ -218,9 +179,8 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Desktop Horizontal Navigation */}
       <div className="hidden lg:block border-t border-slate-800/80 bg-slate-900/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-1 overflow-x-auto py-1 scrollbar-none">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-1 overflow-x-auto py-1">
           {navItems.map((item) => (
             <button
               key={item.id}
@@ -238,29 +198,8 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-slate-900 border-b border-slate-800 px-4 pt-3 pb-5 space-y-3">
-          {/* Level Filter Mobile */}
-          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-            <span className="text-xs text-slate-400">{t.level}:</span>
-            <div className="flex space-x-1">
-              {(['All', 'N5', 'N4', 'N3'] as JLPTFilter[]).map((lvl) => (
-                <button
-                  key={lvl}
-                  onClick={() => onChangeLevel(lvl)}
-                  className={`px-2 py-1 text-xs rounded-md ${
-                    levelFilter === lvl
-                      ? 'bg-rose-600 text-white font-bold'
-                      : 'bg-slate-800 text-slate-400'
-                  }`}
-                >
-                  {lvl}
-                </button>
-              ))}
-            </div>
-          </div>
-
           <div className="grid grid-cols-2 gap-2">
             {navItems.map((item) => (
               <button
@@ -279,24 +218,6 @@ export const Header: React.FC<HeaderProps> = ({
                 <span className="truncate">{item.label}</span>
               </button>
             ))}
-
-            {/* Profile Button in Mobile Menu */}
-            {user && (
-              <button
-                onClick={() => {
-                  onSelectTab('profile');
-                  setMobileMenuOpen(false);
-                }}
-                className={`flex items-center space-x-2 px-3 py-2.5 rounded-lg text-xs text-left font-medium transition-colors col-span-2 ${
-                  currentTab === 'profile'
-                    ? 'bg-rose-600 text-white font-semibold'
-                    : 'bg-rose-950/30 text-rose-300 border border-rose-500/30'
-                }`}
-              >
-                <UserIcon className="w-4 h-4 text-rose-400" />
-                <span className="truncate">{language === 'my' ? 'ကိုယ်ရေးအချက်အလက် (Profile)' : 'Profile'}</span>
-              </button>
-            )}
           </div>
         </div>
       )}
