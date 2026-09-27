@@ -37,26 +37,24 @@ export default function App() {
 
   // Idle Timeout (မိနစ် ၃၀ အတွင်း မလှုပ်ရှားရင် အလိုအလျောက် Log out ဖြစ်ရန်)
   useEffect(() => {
-    if (!user) return; // Login မဝင်ရသေးရင် အလုပ်မလုပ်ရန်
+    if (!user) return;
 
     let inactivityTimer: any;
 
     const resetTimer = () => {
       clearTimeout(inactivityTimer);
-      // မိနစ် ၃၀ (30 * 60 * 1000 ms) - လိုအပ်ပါက အချိန်ချိန်နိုင်ပါသည်
       inactivityTimer = setTimeout(() => {
         auth.signOut();
         setUser(null);
       }, 30 * 60 * 1000); 
     };
 
-    // User လှုပ်ရှားမှုကို စောင့်ကြည့်ရန် events တွေ
     window.addEventListener('mousemove', resetTimer);
     window.addEventListener('keypress', resetTimer);
     window.addEventListener('click', resetTimer);
     window.addEventListener('scroll', resetTimer);
 
-    resetTimer(); // Start timer
+    resetTimer();
 
     return () => {
       clearTimeout(inactivityTimer);
@@ -207,7 +205,7 @@ export default function App() {
               Secure authentication powered by Firebase
             </div>
             <div className="text-[10px] text-slate-600">
-              © 2026 JLPT Master Sensei. All rights reserved.
+              © 2026 Zwe Nyi Nyi Naing. All rights reserved.
             </div>
           </div>
 
