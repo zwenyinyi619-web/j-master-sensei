@@ -15,6 +15,7 @@ import { Footer } from './components/Footer';
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { auth } from "./firebase";
 import { LogIn, Sparkles } from 'lucide-react';
+import { ProfileView } from './components/ProfileView';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<AppTab>('home');
