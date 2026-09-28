@@ -1,3 +1,8 @@
+export default function App() {
+  return <div style={{ padding: '20px', fontSize: '24px' }}>Hello World</div>;
+}
+
+
 import React, { useState, useEffect } from 'react';
 import { AppTab, JLPTFilter, Language } from './types/common';
 import { Header } from './components/Header';
