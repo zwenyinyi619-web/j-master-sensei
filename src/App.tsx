@@ -1,4 +1,4 @@
-Import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppTab, JLPTFilter, Language } from './types/common';
 import { Header } from './components/Header';
 import { HomeView } from './components/HomeView';
@@ -13,7 +13,7 @@ import { QuizView } from './components/QuizView';
 import { WorksheetPrintView } from './components/WorksheetPrintView';
 import { ProfileView } from './components/ProfileView';
 import { Footer } from './components/Footer';
-import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "./firebase";
 import { LogIn, Sparkles, UserCheck } from 'lucide-react';
 
