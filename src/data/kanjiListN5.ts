@@ -109,48 +109,50 @@ const n5CharactersRaw: [string, number, string[], string[], string, string, stri
  * Builds the complete 370 N5 Kanji database.
  */
 export function buildN5KanjiList(): KanjiItem[] {
-  const list: KanjiItem[] = [];
-  const target = 370;
+  const uniqueMap = new Map<string, KanjiItem>();
 
-  for (let i = 0; i < target; i++) {
-    const raw = n5CharactersRaw[i % n5CharactersRaw.length];
+  n5CharactersRaw.forEach((raw) => {
     const kanjiChar = raw[0];
-    const strokes = raw[1];
-    const onyomi = raw[2];
-    const kunyomi = raw[3];
-    const meaningMy = i < n5CharactersRaw.length ? raw[4] : `${raw[4]} (${i + 1})`;
-    const meaningEn = i < n5CharactersRaw.length ? raw[5] : `${raw[5]} (#${i + 1})`;
-    const meaningTh = i < n5CharactersRaw.length ? raw[6] : `${raw[6]} (#${i + 1})`;
-    const meaningVi = i < n5CharactersRaw.length ? raw[7] : `${raw[7]} (#${i + 1})`;
-    const radical = raw[8];
-    const cWord = raw[9];
-    const cRead = raw[10];
-    const cMy = raw[11];
-    const cEn = raw[12];
+    if (!uniqueMap.has(kanjiChar)) {
+      const strokes = raw[1];
+      const onyomi = raw[2];
+      const kunyomi = raw[3];
+      const meaningMy = raw[4];
+      const meaningEn = raw[5];
+      const meaningTh = raw[6];
+      const meaningVi = raw[7];
+      const radical = raw[8];
+      const cWord = raw[9];
+      const cRead = raw[10];
+      const cMy = raw[11];
+      const cEn = raw[12];
 
-    list.push({
-      id: `k-n5-${i + 1}`,
-      kanji: kanjiChar,
-      strokes,
-      jlpt: 'N5',
-      onyomi,
-      kunyomi,
-      meaning_my: meaningMy,
-      meaning_en: meaningEn,
-      meaning_th: meaningTh,
-      meaning_vi: meaningVi,
-      explanation_my: `အခြေခံ N5 ခန်ဂျီ 「${kanjiChar}」 ဖြစ်ပြီး အဓိပ္ပာယ်မှာ ${meaningMy} ဖြစ်ပါသည်။`,
-      explanation_en: `Essential N5 Kanji 「${kanjiChar}」 meaning "${meaningEn}".`,
-      explanation_th: `คันจิ N5 「${kanjiChar}」 หมายถึง "${meaningTh}"`,
-      explanation_vi: `Chữ Hán N5 「${kanjiChar}」 mang ý nghĩa "${meaningVi}".`,
-      radicals: radical,
-      compounds: [
-        { word: cWord, reading: `${cRead} (${cRead})`, romaji: cRead, meaning_my: cMy, meaning_en: cEn, meaning_th: meaningTh, meaning_vi: meaningVi },
-      ],
-    });
-  }
+      const item: KanjiItem = {
+        id: `k-n5-${uniqueMap.size + 1}`,
+        kanji: kanjiChar,
+        strokes,
+        jlpt: 'N5',
+        onyomi,
+        kunyomi,
+        meaning_my: meaningMy,
+        meaning_en: meaningEn,
+        meaning_th: meaningTh,
+        meaning_vi: meaningVi,
+        explanation_my: `အခြေခံ N5 ခန်ဂျီ 「${kanjiChar}」 ဖြစ်ပြီး အဓိပ္ပာယ်မှာ ${meaningMy} ဖြစ်ပါသည်။`,
+        explanation_en: `Essential N5 Kanji 「${kanjiChar}」 meaning "${meaningEn}".`,
+        explanation_th: `คันจิ N5 「${kanjiChar}」 หมายถึง "${meaningTh}"`,
+        explanation_vi: `Chữ Hán N5 「${kanjiChar}」 mang ý nghĩa "${meaningVi}".`,
+        radicals: radical,
+        compounds: [
+          { word: cWord, reading: `${cRead} (${cRead})`, romaji: cRead, meaning_my: cMy, meaning_en: cEn, meaning_th: meaningTh, meaning_vi: meaningVi },
+        ],
+      };
 
-  return list;
+      uniqueMap.set(kanjiChar, item);
+    }
+  });
+
+  return Array.from(uniqueMap.values());
 }
 
 export const kanjiListN5: KanjiItem[] = buildN5KanjiList();
