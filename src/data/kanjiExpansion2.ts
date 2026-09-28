@@ -157,7 +157,7 @@ export const kanjiExpansion2: KanjiItem[] = [
     explanation_th: 'ผู้ใช้พละกำลัง (力) ในทุ่งนา (田) หมายถึง ผู้ชาย',
     explanation_vi: 'Dùng sức lực (lực) trên ruộng đồng (điền), chỉ người đàn ông.',
     compounds: [
-      { word: '男の子', reading: 'おとこのこ (otokonoko)', romaji: 'otokonoko', meaning_my: 'ယောက်ျားလေး', meaning_en: 'Boy', meaning_th: 'เด็กผู้ชาย', meaning_vi: 'Bé trai' },
+      { word: '女の子', reading: 'おとこのこ (otokonoko)', romaji: 'otokonoko', meaning_my: 'ယောက်ျားလေး', meaning_en: 'Boy', meaning_th: 'เด็กผู้ชาย', meaning_vi: 'Bé trai' },
       { word: '男性', reading: 'だんせい (dansei)', romaji: 'dansei', meaning_my: 'အမျိုးသား', meaning_en: 'Male / Man', meaning_th: 'เพศชาย', meaning_vi: 'Nam giới' },
     ],
   },
@@ -396,3 +396,14 @@ export const kanjiExpansion2: KanjiItem[] = [
     ],
   },
 ];
+
+// --- DUPLICATE FILTER (LOOP ကာကွယ်ရန် Unique စစ်ထုတ်သည့် Logic) ---
+const uniqueKanjiMap2 = new Map<string, KanjiItem>();
+
+kanjiExpansion2.forEach((item) => {
+  if (!uniqueKanjiMap2.has(item.kanji)) {
+    uniqueKanjiMap2.set(item.kanji, item);
+  }
+});
+
+export const uniqueKanjiExpansion2: KanjiItem[] = Array.from(uniqueKanjiMap2.values());
