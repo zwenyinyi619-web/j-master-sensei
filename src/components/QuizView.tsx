@@ -5,10 +5,7 @@ import {
   CheckCircle2,
   XCircle,
   Volume2,
-  ArrowRight,
   Sparkles,
-  BookOpen,
-  Filter,
   ListFilter,
   Layers,
   ChevronRight,
@@ -56,7 +53,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
     return allKanjiQuizData;
   }, [activeLevel]);
 
-  // Sliced pool based on questionCountLimit (e.g. 10, 25, 50, 100, 200)
+  // Sliced pool based on questionCountLimit
   const currentQuestions = useMemo(() => {
     return fullLevelPool.slice(0, questionCountLimit);
   }, [fullLevelPool, questionCountLimit]);
@@ -110,7 +107,8 @@ export const QuizView: React.FC<QuizViewProps> = ({
     }
   };
 
-  const getExplanation = (q: KanjiQuizQuestion) => {
+  const getExplanation = (q: KanjiQuizQuestion | undefined) => {
+    if (!q) return '';
     if (language === 'my') return q.explanation_my;
     if (language === 'th') return q.explanation_th || q.explanation_en;
     if (language === 'vi') return q.explanation_vi || q.explanation_en;
@@ -200,7 +198,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
-                {currentQ.level}
+                {currentQ?.level || activeLevel}
               </span>
               <span className="text-xs text-slate-400 font-medium">
                 မေးခွန်း {currentIndex + 1} / {currentQuestions.length}
@@ -226,22 +224,22 @@ export const QuizView: React.FC<QuizViewProps> = ({
           <div className="space-y-2 py-2">
             <div className="flex items-start justify-between gap-3">
               <h3 className="text-xl sm:text-2xl font-bold text-white leading-relaxed">
-                {currentQ.question_jp}
+                {currentQ?.question_jp || ''}
               </h3>
               <button
-                onClick={() => handleAudio(currentQ.question_jp)}
+                onClick={() => currentQ?.question_jp && handleAudio(currentQ.question_jp)}
                 className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-full transition-colors flex-shrink-0"
                 title="Pronounce"
               >
                 <Volume2 className="w-4 h-4" />
               </button>
             </div>
-            <p className="text-xs text-slate-400 font-mono">{currentQ.romaji}</p>
+            <p className="text-xs text-slate-400 font-mono">{currentQ?.romaji || ''}</p>
           </div>
 
           {/* 4 Options Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-            {currentQ.options.map((opt, idx) => {
+            {currentQ?.options?.map((opt, idx) => {
               const isSelected = selectedOption === idx;
               const isCorrect = idx === currentQ.correctIndex;
 
@@ -340,7 +338,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
               {score} / {currentQuestions.length}
             </div>
             <div className="text-xs text-slate-400 mt-1">
-              ရမှတ်ရာခိုင်နှုန်း: {Math.round((score / currentQuestions.length) * 100)}%
+              ရမှတ်ရာခိုင်နှုန်း: {currentQuestions.length > 0 ? Math.round((score / currentQuestions.length) * 100) : 0}%
             </div>
           </div>
 
