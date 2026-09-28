@@ -43,50 +43,53 @@ const n3CharactersRaw: [string, number, string[], string[], string, string, stri
 ];
 
 export function buildN3KanjiList(): KanjiItem[] {
-  const uniqueMap = new Map<string, KanjiItem>();
+  try {
+    if (!Array.isArray(n3CharactersRaw)) return [];
+    
+    const uniqueMap = new Map<string, KanjiItem>();
 
-  n3CharactersRaw.forEach((raw) => {
-    const kanjiChar = raw[0];
-    if (!uniqueMap.has(kanjiChar)) {
-      const strokes = raw[1];
-      const onyomi = raw[2];
-      const kunyomi = raw[3];
-      const meaningMy = raw[4];
-      const meaningEn = raw[5];
-      const meaningTh = raw[6];
-      const meaningVi = raw[7];
-      const radical = raw[8];
-      const cWord = raw[9];
-      const cRead = raw[10];
-      const cMy = raw[11];
-      const cEn = raw[12];
+    n3CharactersRaw.forEach((raw) => {
+      if (!raw || raw.length < 13) return;
+      const kanjiChar = raw[0];
+      if (kanjiChar && !uniqueMap.has(kanjiChar)) {
+        const item: KanjiItem = {
+          id: `k-n3-${uniqueMap.size + 1}`,
+          kanji: kanjiChar,
+          strokes: raw[1] || 1,
+          jlpt: 'N3',
+          onyomi: Array.isArray(raw[2]) ? raw[2] : [],
+          kunyomi: Array.isArray(raw[3]) ? raw[3] : [],
+          meaning_my: raw[4] || '',
+          meaning_en: raw[5] || '',
+          meaning_th: raw[6] || raw[5] || '',
+          meaning_vi: raw[7] || raw[5] || '',
+          explanation_my: `JLPT N3 ခန်ဂျီ 「${kanjiChar}」 ဖြစ်ပြီး အဓိပ္ပာယ်မှာ ${raw[4]} ဖြစ်ပါသည်။`,
+          explanation_en: `JLPT N3 Kanji 「${kanjiChar}」 meaning "${raw[5]}".`,
+          explanation_th: `คันจิ N3 「${kanjiChar}」 หมายถึง "${raw[6] || raw[5]}"`,
+          explanation_vi: `Chữ Hán N3 「${kanjiChar}」 mang ý nghĩa "${raw[7] || raw[5]}".`,
+          radicals: raw[8] || '',
+          compounds: [
+            { 
+              word: raw[9] || '', 
+              reading: `${raw[10] || ''}`, 
+              romaji: raw[10] || '', 
+              meaning_my: raw[11] || '', 
+              meaning_en: raw[12] || '', 
+              meaning_th: raw[12] || '', 
+              meaning_vi: raw[12] || '' 
+            },
+          ],
+        };
 
-      const item: KanjiItem = {
-        id: `k-n3-${uniqueMap.size + 1}`,
-        kanji: kanjiChar,
-        strokes,
-        jlpt: 'N3',
-        onyomi,
-        kunyomi,
-        meaning_my: meaningMy,
-        meaning_en: meaningEn,
-        meaning_th: meaningTh,
-        meaning_vi: meaningVi,
-        explanation_my: `JLPT N3 ခန်ဂျီ 「${kanjiChar}」 ဖြစ်ပြီး အဓိပ္ပာယ်မှာ ${meaningMy} ဖြစ်ပါသည်။`,
-        explanation_en: `JLPT N3 Kanji 「${kanjiChar}」 meaning "${meaningEn}".`,
-        explanation_th: `คันจิ N3 「${kanjiChar}」 หมายถึง "${meaningTh}"`,
-        explanation_vi: `Chữ Hán N3 「${kanjiChar}」 mang ý nghĩa "${meaningVi}".`,
-        radicals: radical,
-        compounds: [
-          { word: cWord, reading: `${cRead} (${cRead})`, romaji: cRead, meaning_my: cMy, meaning_en: cEn, meaning_th: meaningTh, meaning_vi: meaningVi },
-        ],
-      };
+        uniqueMap.set(kanjiChar, item);
+      }
+    });
 
-      uniqueMap.set(kanjiChar, item);
-    }
-  });
-
-  return Array.from(uniqueMap.values());
+    return Array.from(uniqueMap.values());
+  } catch (error) {
+    console.error("Error building N3 kanji list:", error);
+    return [];
+  }
 }
 
 export const kanjiListN3: KanjiItem[] = buildN3KanjiList();
