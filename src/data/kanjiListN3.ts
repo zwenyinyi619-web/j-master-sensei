@@ -44,6 +44,7 @@ const n3CharactersRaw: [string, number, string[], string[], string, string, stri
 
 type RawKanji = (typeof n3CharactersRaw)[number];
 
+// additionalN3Kanji ကို တစ်ကြိမ်သာ ကြေညာထားပါသည်
 const additionalN3Kanji: RawKanji[] = [
   ['愛', 13, ['アイ'], ['あい'], 'ချစ်ခြင်း / မေတ္တာ', 'Love / Affection', 'ความรัก', 'Tình yêu', '心', '愛情', 'あいじょう', 'ချစ်ခြင်းမေတ္တာ', 'Affection'],
   ['暗', 13, ['アン'], ['くら・い'], 'မှောင်မိုက်သော', 'Dark / Darkness', 'มืด', 'Tối', '日', '暗い', 'くらい', 'မှောင်သော', 'Dark'],
@@ -284,7 +285,7 @@ const additionalN3Kanji: RawKanji[] = [
   ['晴', 12, ['セイ'], ['は・れる', 'は・らす'], 'ရာသီဥတု ကြည်လင်သည်', 'Clear up / Sunny', 'ท้องฟ้าแจ่มใส', 'Trời quang', '日', '晴れる', 'はれる', 'ကြည်လင်သည်', 'Clear up'],
   ['石', 5, ['セキ', 'シャク'], ['いし'], 'ကျောက်', 'Stone', 'หิน', 'Đá', '石', '石', 'いし', 'ကျောက်', 'Stone'],
   ['席', 10, ['セキ'], [''], 'ထိုင်ခုံ / နေရာ', 'Seat / Place', 'ที่นั่ง', 'Chỗ ngồi', '巾', '出席', 'しゅっせき', 'တက်ရောက်ခြင်း', 'Attendance'],
-  ['積', 16, ['セキ'], ['つ・む', 'つ・もる'], 'စုပုံသည် / တင်ဆောင်သည်', 'Pile up / Load', 'สะสม / บรรทุก', 'Chất đống / Chở', '禾', '積む', 'つむ', 'တင်ဆောင်သည်', 'Load'],
+  ['積', 16, ['セキ'], ['つ・む', 'つ・もる'], 'စုပုံသည် / တင်ဆောင်သည်', 'Pile up / Load', 'สะสม / บรรทุน', 'Chất đống / Chở', '禾', '積む', 'つむ', 'တင်ဆောင်သည်', 'Load'],
   ['責', 11, ['セキ'], ['せ・める'], 'အပြစ်တင်သည် / တာဝန်', 'Blame / Responsibility', 'ตำหนิ / ความรับผิดชอบ', 'Trách móc / Trách nhiệm', '貝', '責任', 'せきにん', 'တာဝန်ယူမှု', 'Responsibility'],
   ['雪', 11, ['セツ'], ['ゆき'], 'နှင်း', 'Snow', 'หิมะ', 'Tuyết', '雨', '雪', 'ゆき', 'နှင်း', 'Snow'],
   ['昔', 8, ['セキ', 'シャク'], ['むかし'], 'ရှေးယခင် / အတိတ်', 'Long ago / Past', 'สมัยก่อน', 'Ngày xưa', '日', '昔', 'むかし', 'ရှေးယခင်', 'Long ago'],
@@ -392,11 +393,6 @@ const additionalN3Kanji: RawKanji[] = [
   ['増', 14, ['ゾウ'], ['ふ・える', 'ふ・やす'], 'တိုးလာသည် / တိုးပွားစေသည်', 'Increase', 'เพิ่มขึ้น', 'Tăng', '土', '増える', 'ふえる', 'တိုးလာသည်', 'Increase'],
 ];
 
-// နောက်ထပ် ထည့်သွင်းလိုသော အသစ်များ (Duplicate များကို အလိုအလျောက် စစ်ထုတ်ပေးမည်)
-const additionalN3Kanji: RawKanji[] = [
-  // လိုအပ်ပါက ဤနေရာတွင် ထပ်မံထည့်သွင်းနိုင်သည်
-];
-
 // ရှိပြီးသား kanji များကို duplicate မဖြစ်အောင် စစ်ဆေးပြီး ပေါင်းထည့်ခြင်း
 const existingN3Kanji = new Set(n3CharactersRaw.map(([kanji]) => kanji));
 n3CharactersRaw.push(
@@ -408,7 +404,6 @@ export function buildN3KanjiList(): KanjiItem[] {
 
   n3CharactersRaw.forEach((raw) => {
     const kanjiChar = raw[0];
-    // Map ကို အသုံးပြုထားသဖြင့် Kanji တစ်လုံးလျှင် တစ်ကြိမ်သာ သေချာပေါက် ပါဝင်မည်ဖြစ်သည်
     if (!uniqueMap.has(kanjiChar)) {
       const strokes = raw[1];
       const onyomi = raw[2];
