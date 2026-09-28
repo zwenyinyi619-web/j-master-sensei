@@ -26,7 +26,6 @@ const n3CharactersRaw: [string, number, string[], string[], string, string, stri
   ['費', 12, ['ヒ'], ['つい・やす'], 'ကုန်ကျစရိတ်', 'Expense / Cost', 'ค่าใช้จ่าย', 'Chi phí', '貝', '費用', 'ひよう', 'ကုန်ကျငွေ', 'Cost / Expense'],
   ['資', 13, ['シ'], [''], 'အရင်းအနှီး / အရင်းအမြစ်', 'Resource / Capital', 'ทรัพยากร / ทุน', 'Tài nguyên / Vốn', '貝', '資料', 'しりょう', 'စာရွက်စာတမ်း အချက်အလက်', 'Materials / Data'],
   ['質', 15, ['シツ', 'シチ'], [''], 'အရည်အသွေး / သဘာဝ', 'Quality / Nature', 'คุณภาพ', 'Chất lượng', '貝', '質問', 'しつもん', 'မေးခွန်း', 'Question'],
-  ['貸', 12, ['タイ'], ['か・す'], 'ငှားပေးသည်', 'Lend', 'ให้ยืม', 'Cho mượn', '貝', '貸出', 'かしだし', 'ထုတ်ငှားခြင်း', 'Lending'],
   ['迎', 7, ['ゲイ'], ['むか・える'], 'ကြိုဆိုသည်', 'Welcome / Greet', 'ต้อนรับ', 'Đón tiếp', '辵', '歓迎', 'かんげい', 'လှိုက်လှဲစွာ ကြိုဆိုခြင်း', 'Warm welcome'],
   ['送', 9, ['ソウ'], ['おく・る'], 'ပို့ဆောင်သည်', 'Send / Escort', 'ส่ง', 'Gửi đi', '辵', '放送', 'ほうそう', 'အသံလွှင့်ခြင်း', 'Broadcasting'],
   ['通', 10, ['ツウ', 'ツ'], ['とお・る', 'かよ・う'], 'သွားလာလှုပ်ရှားသည် / ဖြတ်သန်းသည်', 'Commute / Pass', 'สัญจร / ผ่าน', 'Thông qua / Đi lại', '辵', '交通', 'こうつう', 'သယ်ယူပို့ဆောင်ရေး', 'Traffic'],
@@ -44,48 +43,50 @@ const n3CharactersRaw: [string, number, string[], string[], string, string, stri
 ];
 
 export function buildN3KanjiList(): KanjiItem[] {
-  const list: KanjiItem[] = [];
-  const target = 370; // User specified 370 for N3
+  const uniqueMap = new Map<string, KanjiItem>();
 
-  for (let i = 0; i < target; i++) {
-    const raw = n3CharactersRaw[i % n3CharactersRaw.length];
+  n3CharactersRaw.forEach((raw) => {
     const kanjiChar = raw[0];
-    const strokes = raw[1];
-    const onyomi = raw[2];
-    const kunyomi = raw[3];
-    const meaningMy = i < n3CharactersRaw.length ? raw[4] : `${raw[4]} (${i + 1})`;
-    const meaningEn = i < n3CharactersRaw.length ? raw[5] : `${raw[5]} (#${i + 1})`;
-    const meaningTh = i < n3CharactersRaw.length ? raw[6] : `${raw[6]} (#${i + 1})`;
-    const meaningVi = i < n3CharactersRaw.length ? raw[7] : `${raw[7]} (#${i + 1})`;
-    const radical = raw[8];
-    const cWord = raw[9];
-    const cRead = raw[10];
-    const cMy = raw[11];
-    const cEn = raw[12];
+    if (!uniqueMap.has(kanjiChar)) {
+      const strokes = raw[1];
+      const onyomi = raw[2];
+      const kunyomi = raw[3];
+      const meaningMy = raw[4];
+      const meaningEn = raw[5];
+      const meaningTh = raw[6];
+      const meaningVi = raw[7];
+      const radical = raw[8];
+      const cWord = raw[9];
+      const cRead = raw[10];
+      const cMy = raw[11];
+      const cEn = raw[12];
 
-    list.push({
-      id: `k-n3-${i + 1}`,
-      kanji: kanjiChar,
-      strokes,
-      jlpt: 'N3',
-      onyomi,
-      kunyomi,
-      meaning_my: meaningMy,
-      meaning_en: meaningEn,
-      meaning_th: meaningTh,
-      meaning_vi: meaningVi,
-      explanation_my: `JLPT N3 ခန်ဂျီ 「${kanjiChar}」 ဖြစ်ပြီး အဓိပ္ပာယ်မှာ ${meaningMy} ဖြစ်ပါသည်။`,
-      explanation_en: `JLPT N3 Kanji 「${kanjiChar}」 meaning "${meaningEn}".`,
-      explanation_th: `คันจิ N3 「${kanjiChar}」 หมายถึง "${meaningTh}"`,
-      explanation_vi: `Chữ Hán N3 「${kanjiChar}」 mang ý nghĩa "${meaningVi}".`,
-      radicals: radical,
-      compounds: [
-        { word: cWord, reading: `${cRead} (${cRead})`, romaji: cRead, meaning_my: cMy, meaning_en: cEn, meaning_th: meaningTh, meaning_vi: meaningVi },
-      ],
-    });
-  }
+      const item: KanjiItem = {
+        id: `k-n3-${uniqueMap.size + 1}`,
+        kanji: kanjiChar,
+        strokes,
+        jlpt: 'N3',
+        onyomi,
+        kunyomi,
+        meaning_my: meaningMy,
+        meaning_en: meaningEn,
+        meaning_th: meaningTh,
+        meaning_vi: meaningVi,
+        explanation_my: `JLPT N3 ခန်ဂျီ 「${kanjiChar}」 ဖြစ်ပြီး အဓိပ္ပာယ်မှာ ${meaningMy} ဖြစ်ပါသည်။`,
+        explanation_en: `JLPT N3 Kanji 「${kanjiChar}」 meaning "${meaningEn}".`,
+        explanation_th: `คันจิ N3 「${kanjiChar}」 หมายถึง "${meaningTh}"`,
+        explanation_vi: `Chữ Hán N3 「${kanjiChar}」 mang ý nghĩa "${meaningVi}".`,
+        radicals: radical,
+        compounds: [
+          { word: cWord, reading: `${cRead} (${cRead})`, romaji: cRead, meaning_my: cMy, meaning_en: cEn, meaning_th: meaningTh, meaning_vi: meaningVi },
+        ],
+      };
 
-  return list;
+      uniqueMap.set(kanjiChar, item);
+    }
+  });
+
+  return Array.from(uniqueMap.values());
 }
 
 export const kanjiListN3: KanjiItem[] = buildN3KanjiList();
