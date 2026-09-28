@@ -7,6 +7,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [react()],
+  base: './', // ဒီနေရာလေး ထည့်ပေးဖို့ လိုပါတယ်
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
