@@ -1148,3 +1148,16 @@ export const kanjiExpansion: KanjiItem[] = [
     ],
   },
 ];
+
+// --- DUPLICATE FILTER (LOOP ကာကွယ်ရန် Unique စစ်ထုတ်သည့် Logic) ---
+const uniqueKanjiMap = new Map<string, KanjiItem>();
+
+kanjiExpansion.forEach((item) => {
+  // kanji (သို့) id တူနေပါက ထပ်မံမထည့်ဘဲ တစ်ခုတည်းကိုသာ ယူပါမည်
+  if (!uniqueKanjiMap.has(item.kanji)) {
+    uniqueKanjiMap.set(item.kanji, item);
+  }
+});
+
+// ထွက်လာသော Unique ဖြစ်ပြီးသား ခန်ဂျီစာရင်းစစ်စစ်
+export const uniqueKanjiExpansion: KanjiItem[] = Array.from(uniqueKanjiMap.values());
