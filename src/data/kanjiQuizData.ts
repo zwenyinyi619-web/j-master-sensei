@@ -16,16 +16,24 @@ export interface KanjiQuizQuestion {
 }
 
 /**
- * Builds 200 distinct, high quality quiz questions for each JLPT level (N5, N4, N3).
+ * Builds distinct, high quality quiz questions for each JLPT level without duplicates.
  */
 export function generateLevelKanjiQuestions(level: JLPTLevel, count: number = 200): KanjiQuizQuestion[] {
   const levelKanji = kanjiData.filter((k) => k.jlpt === level);
   const questions: KanjiQuizQuestion[] = [];
+  const seenQuestionSignatures = new Set<string>(); // မေးခွန်းထပ်နေမှု မရှိစေရန် စစ်ဆေးသည့် Set
 
-  for (let i = 0; i < count; i++) {
+  if (levelKanji.length === 0) return questions;
+
+  let i = 0;
+  let safetyCounter = 0; // Infinite loop ကာကွယ်ရန်
+
+  while (questions.length < count && safetyCounter < count * 10) {
     const kItem = levelKanji[i % levelKanji.length];
     const qTypeIndex = i % 4;
     const compound = kItem.compounds[0] || { word: kItem.kanji, reading: kItem.kunyomi[0] || kItem.onyomi[0] || '' };
+
+    let currentQ: KanjiQuizQuestion | null = null;
 
     if (qTypeIndex === 0) {
       // Type 1: Kanji to Reading
@@ -42,25 +50,32 @@ export function generateLevelKanjiQuestions(level: JLPTLevel, count: number = 20
         wrong3.split(' ')[0].replace(/[\(\)\-・]/g, ''),
       ];
 
-      // Shuffle options deterministically
       const correctIndex = (i + 1) % 4;
       const temp = options[0];
       options[0] = options[correctIndex];
       options[correctIndex] = temp;
 
-      questions.push({
-        id: `kq-${level.toLowerCase()}-${i + 1}`,
-        level,
-        type: 'reading',
-        question_jp: `「${kItem.kanji}」の正しい読み方はどれですか。`,
-        romaji: `"${kItem.kanji}" no tadashii yomikata wa dore desu ka.`,
-        options,
-        correctIndex,
-        explanation_my: `ခန်ဂျီ 「${kItem.kanji}」 ၏ အသံထွက်မှာ "${cleanReading}" ဖြစ်ပြီး၊ အဓိပ္ပာယ်မှာ "${kItem.meaning_my}" ဖြစ်ပါသည်။`,
-        explanation_en: `The reading of 「${kItem.kanji}」 is "${cleanReading}", meaning "${kItem.meaning_en}".`,
-        explanation_th: `เสียงอ่านของ 「${kItem.kanji}」 คือ "${cleanReading}" แปลว่า "${kItem.meaning_th || kItem.meaning_en}"`,
-        explanation_vi: `Cách đọc của 「${kItem.kanji}」 là "${cleanReading}", có nghĩa là "${kItem.meaning_vi || kItem.meaning_en}".`,
-      });
+      const questionJp = `「${kItem.kanji}」の正しい読み方はどれですか。`;
+      
+      // မေးခွန်းနှင့် အဖြေတူနေသည်များကို စစ်ဆေးရန် Signature တည်ဆောက်ခြင်း
+      const signature = `${level}-${qTypeIndex}-${kItem.kanji}-${options.join('-')}`;
+
+      if (!seenQuestionSignatures.has(signature)) {
+        seenQuestionSignatures.add(signature);
+        currentQ = {
+          id: `kq-${level.toLowerCase()}-${questions.length + 1}`,
+          level,
+          type: 'reading',
+          question_jp,
+          romaji: `"${kItem.kanji}" no tadashii yomikata wa dore desu ka.`,
+          options,
+          correctIndex,
+          explanation_my: `ခန်ဂျီ 「${kItem.kanji}」 ၏ အသံထွက်မှာ "${cleanReading}" ဖြစ်ပြီး၊ အဓိပ္ပာယ်မှာ "${kItem.meaning_my}" ဖြစ်ပါသည်။`,
+          explanation_en: `The reading of 「${kItem.kanji}」 is "${cleanReading}", meaning "${kItem.meaning_en}".`,
+          explanation_th: `เสียงอ่านของ 「${kItem.kanji}」 คือ "${cleanReading}" แปลว่า "${kItem.meaning_th || kItem.meaning_en}"`,
+          explanation_vi: `Cách đọc của 「${kItem.kanji}」 là "${cleanReading}", có nghĩa là "${kItem.meaning_vi || kItem.meaning_en}".`,
+        };
+      }
     } else if (qTypeIndex === 1) {
       // Type 2: Reading / Meaning to Kanji
       const wrongK1 = levelKanji[(i + 5) % levelKanji.length].kanji;
@@ -73,19 +88,25 @@ export function generateLevelKanjiQuestions(level: JLPTLevel, count: number = 20
       options[0] = options[correctIndex];
       options[correctIndex] = temp;
 
-      questions.push({
-        id: `kq-${level.toLowerCase()}-${i + 1}`,
-        level,
-        type: 'kanji',
-        question_jp: `「${kItem.meaning_my}」を表す漢字はどれですか。`,
-        romaji: `Meaning: "${kItem.meaning_en}" - Which is the correct kanji?`,
-        options,
-        correctIndex,
-        explanation_my: `「${kItem.meaning_my}」ကို ကိုယ်စားပြုသော ခန်ဂျီမှာ 「${kItem.kanji}」 ဖြစ်ပါသည်။`,
-        explanation_en: `The kanji that represents "${kItem.meaning_en}" is 「${kItem.kanji}」.`,
-        explanation_th: `คันจิที่มีความหมายว่า "${kItem.meaning_th || kItem.meaning_en}" คือ 「${kItem.kanji}」`,
-        explanation_vi: `Chữ Hán biểu thị ý nghĩa "${kItem.meaning_vi || kItem.meaning_en}" là 「${kItem.kanji}」.`,
-      });
+      const questionJp = `「${kItem.meaning_my}」を表す漢字はどれですか。`;
+      const signature = `${level}-${qTypeIndex}-${kItem.meaning_my}-${options.join('-')}`;
+
+      if (!seenQuestionSignatures.has(signature)) {
+        seenQuestionSignatures.add(signature);
+        currentQ = {
+          id: `kq-${level.toLowerCase()}-${questions.length + 1}`,
+          level,
+          type: 'kanji',
+          question_jp,
+          romaji: `Meaning: "${kItem.meaning_en}" - Which is the correct kanji?`,
+          options,
+          correctIndex,
+          explanation_my: `「${kItem.meaning_my}」ကို ကိုယ်စားပြုသော ခန်ဂျီမှာ 「${kItem.kanji}」 ဖြစ်ပါသည်။`,
+          explanation_en: `The kanji that represents "${kItem.meaning_en}" is 「${kItem.kanji}」.`,
+          explanation_th: `คันจิที่มีความหมายว่า "${kItem.meaning_th || kItem.meaning_en}" คือ 「${kItem.kanji}」`,
+          explanation_vi: `Chữ Hán biểu thị ý nghĩa "${kItem.meaning_vi || kItem.meaning_en}" là 「${kItem.kanji}」.`,
+        };
+      }
     } else if (qTypeIndex === 2) {
       // Type 3: Contextual sentence reading
       const targetWord = compound.word;
@@ -100,19 +121,25 @@ export function generateLevelKanjiQuestions(level: JLPTLevel, count: number = 20
       options[0] = options[correctIndex];
       options[correctIndex] = temp;
 
-      questions.push({
-        id: `kq-${level.toLowerCase()}-${i + 1}`,
-        level,
-        type: 'context',
-        question_jp: `山田さんは「${targetWord}」をよく知っています。（下線部の読み方）`,
-        romaji: `Yamada-san wa "${targetWord}" o yoku shitte imasu. (Underlined reading)`,
-        options,
-        correctIndex,
-        explanation_my: `စကားလုံး 「${targetWord}」 ၏ မှန်ကန်သော အသံထွက်မှာ "${targetRead}" ဖြစ်ပါသည်။`,
-        explanation_en: `The correct reading for compound word 「${targetWord}」 is "${targetRead}".`,
-        explanation_th: `คำประสม 「${targetWord}」 อ่านออกเสียงที่ถูกต้องคือ "${targetRead}"`,
-        explanation_vi: `Cách đọc đúng của từ ghép 「${targetWord}」 là "${targetRead}".`,
-      });
+      const questionJp = `山田さんは「${targetWord}」をよく知っています。（下線部の読み方）`;
+      const signature = `${level}-${qTypeIndex}-${targetWord}-${options.join('-')}`;
+
+      if (!seenQuestionSignatures.has(signature)) {
+        seenQuestionSignatures.add(signature);
+        currentQ = {
+          id: `kq-${level.toLowerCase()}-${questions.length + 1}`,
+          level,
+          type: 'context',
+          question_jp,
+          romaji: `Yamada-san wa "${targetWord}" o yoku shitte imasu. (Underlined reading)`,
+          options,
+          correctIndex,
+          explanation_my: `စကားလုံး 「${targetWord}」 ၏ မှန်ကန်သော အသံထွက်မှာ "${targetRead}" ဖြစ်ပါသည်။`,
+          explanation_en: `The correct reading for compound word 「${targetWord}」 is "${targetRead}".`,
+          explanation_th: `คำประสม 「${targetWord}」 อ่านออกเสียงที่ถูกต้องคือ "${targetRead}"`,
+          explanation_vi: `Cách đọc đúng của từ ghép 「${targetWord}」 là "${targetRead}".`,
+        };
+      }
     } else {
       // Type 4: Meaning check
       const wrongM1 = levelKanji[(i + 4) % levelKanji.length].meaning_my;
@@ -125,20 +152,33 @@ export function generateLevelKanjiQuestions(level: JLPTLevel, count: number = 20
       options[0] = options[correctIndex];
       options[correctIndex] = temp;
 
-      questions.push({
-        id: `kq-${level.toLowerCase()}-${i + 1}`,
-        level,
-        type: 'meaning',
-        question_jp: `漢字「${kItem.kanji}」の主な意味は何ですか。`,
-        romaji: `Kanji "${kItem.kanji}" no omo na imi wa nan desu ka.`,
-        options,
-        correctIndex,
-        explanation_my: `ခန်ဂျီ 「${kItem.kanji}」 ၏ အဓိက အဓိပ္ပာယ်မှာ "${kItem.meaning_my}" (${kItem.meaning_en}) ဖြစ်ပါသည်။`,
-        explanation_en: `The primary meaning of Kanji 「${kItem.kanji}」 is "${kItem.meaning_en}".`,
-        explanation_th: `ความหมายหลักของคันจิ 「${kItem.kanji}」 คือ "${kItem.meaning_th || kItem.meaning_en}"`,
-        explanation_vi: `Ý nghĩa chính của chữ Hán 「${kItem.kanji}」 là "${kItem.meaning_vi || kItem.meaning_en}".`,
-      });
+      const questionJp = `漢字「${kItem.kanji}」の主な意味は何ですか。`;
+      const signature = `${level}-${qTypeIndex}-${kItem.kanji}-${options.join('-')}`;
+
+      if (!seenQuestionSignatures.has(signature)) {
+        seenQuestionSignatures.add(signature);
+        currentQ = {
+          id: `kq-${level.toLowerCase()}-${questions.length + 1}`,
+          level,
+          type: 'meaning',
+          question_jp,
+          romaji: `Kanji "${kItem.kanji}" no omo na imi wa nan desu ka.`,
+          options,
+          correctIndex,
+          explanation_my: `ခန်ဂျီ 「${kItem.kanji}」 ၏ အဓိက အဓိပ္ပာယ်မှာ "${kItem.meaning_my}" (${kItem.meaning_en}) ဖြစ်ပါသည်။`,
+          explanation_en: `The primary meaning of Kanji 「${kItem.kanji}」 is "${kItem.meaning_en}".`,
+          explanation_th: `ความหมายหลักของคันจิ 「${kItem.kanji}」 คือ "${kItem.meaning_th || kItem.meaning_en}"`,
+          explanation_vi: `Ý nghĩa chính của chữ Hán 「${kItem.kanji}」 là "${kItem.meaning_vi || kItem.meaning_en}".`,
+        };
+      }
     }
+
+    if (currentQ) {
+      questions.push(currentQ);
+    }
+
+    i++;
+    safetyCounter++;
   }
 
   return questions;
