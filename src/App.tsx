@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { AppTab, JLPTFilter, Language } from './types/common';
 import { Header } from './components/Header';
 import { HomeView } from './components/HomeView';
+import { VerbTable } from './components/VerbTable';
+import { GrammarGuideView } from './components/GrammarGuideView';
+import { KanjiView } from './components/KanjiView';
+import { QuizView } from './components/QuizView';
+import { AIConversation } from './components/AIConversation';
+import { ProfileView } from './components/ProfileView';
 import { Footer } from './components/Footer';
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
@@ -54,6 +60,12 @@ export default function App() {
             soundEnabled={soundEnabled}
           />
         )}
+        {currentTab === 'verbs' && <VerbTable language={language} levelFilter={levelFilter} soundEnabled={soundEnabled} />}
+        {currentTab === 'grammar' && <GrammarGuideView language={language} levelFilter={levelFilter} soundEnabled={soundEnabled} />}
+        {currentTab === 'kanji' && <KanjiView language={language} levelFilter={levelFilter} soundEnabled={soundEnabled} />}
+        {currentTab === 'quiz' && <QuizView language={language} levelFilter={levelFilter} soundEnabled={soundEnabled} />}
+        {currentTab === 'chat' && <AIConversation language={language} user={user} />}
+        {currentTab === 'settings' && <ProfileView language={language} user={user} />}
       </main>
 
       <Footer language={language} onCycleLanguage={() => setLanguage(language === 'my' ? 'en' : 'my')} />
